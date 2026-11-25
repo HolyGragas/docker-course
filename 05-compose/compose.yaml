@@ -1,0 +1,29 @@
+services:
+  web:
+    build: ./app
+    ports:
+      - "8000:5000"
+    environment:
+      DB_HOST: db
+      DB_NAME: course
+      DB_USER: course
+      DB_PASSWORD: course-lab-password   # lab only - use secrets/.env for real projects
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: course
+      POSTGRES_USER: course
+      POSTGRES_PASSWORD: course-lab-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U course -d course"]
+      interval: 3s
+      retries: 10
+
+volumes:
+  db-data:
